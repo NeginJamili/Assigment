@@ -49,8 +49,8 @@ forbes$age_group <- factor(forbes$age_group,
 
 ggplot(data = forbes, mapping = aes(x = age_group, y = log(net_worth), fill = age_group)) +
   geom_boxplot(show.legend = FALSE) +
-  xlab('Age Group') +
-  ylab('Log of net worth') 
+  xlab("Age Group") +
+  ylab("Log of net worth") 
 
 # Considering the plot, now we can observe that older people have more wealth
 # in average, although the larger amounts are possessed by 70-80 years old people.
@@ -68,14 +68,26 @@ group_by_counry <- forbes %>%
 ggplot(group_by_counry, aes(x = country, y = range)) +
   geom_bar(stat = "identity", color = "cadetblue4", fill = "aquamarine2") + 
   coord_flip() +
-  ylab('difference between the highest and lowest net worth') +
+  ylab("difference between the highest and lowest net worth") +
   theme_bw ()
 
 # Q6 ----------------------------------------------------------------------
+
 ggplot(group_by_counry, aes(x = reorder(country,range), y = range)) +
   geom_bar(stat = "identity", color = "cadetblue4", fill = "aquamarine2") + 
   coord_flip() +
   ylab('difference between the highest and lowest net worth') +
   theme_bw () +
-  ylab('Country')
+  ylab("Country")
+
+# Q7 ----------------------------------------------------------------------
+
+group_by_rank <- forbes %>% 
+  group_by(rank) %>% 
+  summarise(count = n()) %>% 
+  filter (count > 1) %>% 
+  View ()
+
+# There are 19 ranks where more than one person are assigned to them (6, 27, ...)
+# The given table shows how many persons are assigned to shared ranks
 
