@@ -85,9 +85,16 @@ ggplot(group_by_counry, aes(x = reorder(country,range), y = range)) +
 group_by_rank <- forbes %>% 
   group_by(rank) %>% 
   summarise(count = n()) %>% 
-  filter (count > 1) %>% 
-  View ()
+  filter (count > 1)
 
+View (group_by_rank)
 # There are 19 ranks where more than one person are assigned to them (6, 27, ...)
 # The given table shows how many persons are assigned to shared ranks
 
+# Q8 ----------------------------------------------------------------------
+
+group_by_rank <- group_by_rank %>% 
+  mutate (new_rank = rank + (count-1)/2)
+
+# The table shows the new ranking as well as the previous one
+ 
