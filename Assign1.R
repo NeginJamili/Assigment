@@ -78,7 +78,7 @@ ggplot(group_by_counry, aes(x = reorder(country,range), y = range)) +
   coord_flip() +
   ylab('difference between the highest and lowest net worth') +
   theme_bw () +
-  ylab("Country")
+  xlab("Country")
 
 # Q7 ----------------------------------------------------------------------
 
@@ -97,10 +97,16 @@ group_by_rank <- group_by_rank %>%
   mutate (new_rank = rank + (count-1)/2)
 
 # The table shows the new ranking as well as the previous one
- 
-new_forbes <- left_join (forbes, group_by_rank)
-new_forbes$new_rank[is.na(new_forbes$new_rank)] <- new_forbes$rank
-new_forbes <- subset(new_forbes, select = -count )
+# We can also add the new ranking to the initial data as below:
+group_by_rank1 <- forbes %>% 
+  group_by(rank) %>% 
+  summarise(count = n())  
+
+group_by_rank1 <- group_by_rank1 %>% 
+  mutate (new_rank = rank + (count-1)/2)
+
+new_forbes <- left_join (forbes, group_by_rank1)
+new_forbes <- select(new_forbes, rank, new_rank, name:age_group)
 
 # Q9 ----------------------------------------------------------------------
 install.packages("rworldmap")
