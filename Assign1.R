@@ -98,3 +98,27 @@ group_by_rank <- group_by_rank %>%
 
 # The table shows the new ranking as well as the previous one
  
+new_forbes <- left_join (forbes, group_by_rank)
+new_forbes$new_rank[is.na(new_forbes$new_rank)] <- new_forbes$rank
+new_forbes <- subset(new_forbes, select = -count )
+
+# Q9 ----------------------------------------------------------------------
+install.packages("rworldmap")
+library(rworldmap)
+
+# Using verbose in order to define which country is omitted ->  
+# Polynesia cannot be matched -> I have to recode it
+
+NewGroups <- forbes %>% 
+  group_by(country) %>% 
+  summarise(sum_net = log(sum(net_worth)))
+NewGroups$country <- recode(NewGroups$country
+                         ,"Polynesia" = "French Polynesia")
+MapData <- joinCountryData2Map(NewGroups, joinCode = "NAME",
+                               nameJoinColumn = "country", verbose=TRUE)
+
+mapCountryData(MapData, nameColumnToPlot="sum_net", 
+               mapTitle="Net Worth Per Country", colourPalette="terrain", 
+               oceanCol="aliceblue") 
+ 
+
