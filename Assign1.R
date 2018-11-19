@@ -63,3 +63,10 @@ group_by_counry <- forbes %>%
   filter(count >= 6) %>%
   arrange(range)
 
+# Q5 ----------------------------------------------------------------------
+
+ggplot(group_by_counry, aes(x = country, y = range)) +
+  geom_bar(stat = "identity", color = "cadetblue4", fill = "aquamarine2") + 
+  coord_flip() +
+  ylab('difference between the highest and lowest net worth') +
+  theme_bw ()
