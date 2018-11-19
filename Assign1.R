@@ -55,4 +55,11 @@ ggplot(data = forbes, mapping = aes(x = age_group, y = log(net_worth), fill = ag
 # Considering the plot, now we can observe that older people have more wealth
 # in average, although the larger amounts are possessed by 70-80 years old people.
 
+# Q4 ----------------------------------------------------------------------
+
+group_by_counry <- forbes %>%
+  group_by(country) %>%
+  summarise(count = n(), range = max(net_worth) - min(net_worth)) %>%
+  filter(count >= 6) %>%
+  arrange(range)
 
