@@ -70,3 +70,12 @@ ggplot(group_by_counry, aes(x = country, y = range)) +
   coord_flip() +
   ylab('difference between the highest and lowest net worth') +
   theme_bw ()
+
+# Q6 ----------------------------------------------------------------------
+ggplot(group_by_counry, aes(x = reorder(country,range), y = range)) +
+  geom_bar(stat = "identity", color = "cadetblue4", fill = "aquamarine2") + 
+  coord_flip() +
+  ylab('difference between the highest and lowest net worth') +
+  theme_bw () +
+  ylab('Country')
+
