@@ -4,7 +4,7 @@ library(tidyverse)
 # Question 1 ------------------------------------------------------------------------------------------------------
 
 
-<<<<<<< HEAD
+
 #' Title
 #' 
 #' @param data 
@@ -31,12 +31,6 @@ Example <- data.frame(
 )
 Example <- tidy_df(Example, "var")
 Example
-=======
-tidy_df <- function(data, column_prefix = "var"){
-  
-}
-
->>>>>>> c08e94fea970d8d17be5a4ef61810367d94971f3
 
 # Question 2 ------------------------------------------------------------------------------------------------------
 
@@ -57,9 +51,39 @@ get_jane_austen_data <- function(){
   invisible()
 }
 
+get_jane_austen_data ()
+
 # extract_possible_names 
 
+austen_text1 <- austen_text
+# to find number of words in each row, to be able to separate into columns
+austen_textCop <- mutate (austen_text1, NoWords = 
+                            str_count(austen_text1$text, '\\w+'))
+# find the maximum number of words to know the number of new columns to be created
+maxWords <- max(austen_text1$NoWords) + 1
+# first I didn't add 1, then I noticed this error:
+# Additional pieces discarded in 7 rows. I found out that the reason is that " is counted as one word 
+# in sentences that start with ". So I added 1 to resolve this error
 
+# name of the new columns
+mynames = c(paste("word",1:maxWords,sep=""))
+# separating all words of a sentence into several columns 
+Austen_Sep <- separate(austen_text1, "text", into = mynames, remove = TRUE)
+# using the previous function to gather all the words in 1 column
+tidy_df <- function(data, column_prefix = "var"){
+  data %>%
+    gather(starts_with(column_prefix), key = "variable", value = "value") %>% 
+    select(variable, value, everything())
+}
+Austen_Sep <- tidy_df(Austen_Sep, "word")
+# to filter those with capital first letter (. to removw "A" or "I" from the list)
+Austen_Sep <- filter(Austen_Sep, value > 0 & str_detect(value,"^[A-Z]."))
+#Adjusting the column names
+Austen_Sep = rename(Austen_Sep, text_id = id, name = value)
+# defining unique id
+Austen_Sep <- mutate(Austen_Sep, id = rownames(Austen_Sep))
+
+Austen_Sep <- select(Austen_Sep, id, text_id, name)
 
 
 # Question 3 ------------------------------------------------------------------------------------------------------
