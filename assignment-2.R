@@ -5,9 +5,21 @@ library(tidyverse)
 
 
 tidy_df <- function(data, column_prefix = "var"){
-  
+  data %>%
+    gather(starts_with(column_prefix), key = "variable", value = "value") %>% 
+    select(variable, value, everything())
 }
+# I reordered the table to have the columns that start with the given prefix as
+# the first columns
 
+# To check the function:
+Example <- data.frame(
+  var1 = c(1:3),
+  var2 = c(6, 7, 4),
+  others = c(4:6)
+)
+Example <- tidy_df(Example, "var")
+Example
 
 # Question 2 ------------------------------------------------------------------------------------------------------
 
