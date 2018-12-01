@@ -4,6 +4,7 @@ library(tidyverse)
 # Question 1 ------------------------------------------------------------------------------------------------------
 
 
+<<<<<<< HEAD
 #' Title
 #' 
 #' @param data 
@@ -30,6 +31,12 @@ Example <- data.frame(
 )
 Example <- tidy_df(Example, "var")
 Example
+=======
+tidy_df <- function(data, column_prefix = "var"){
+  
+}
+
+>>>>>>> c08e94fea970d8d17be5a4ef61810367d94971f3
 
 # Question 2 ------------------------------------------------------------------------------------------------------
 
