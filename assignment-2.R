@@ -4,6 +4,16 @@ library(tidyverse)
 # Question 1 ------------------------------------------------------------------------------------------------------
 
 
+#' Title
+#'
+#' @param data 
+#' @param column_prefix 
+#'
+#' @return A data frame with one column for the variables start with column_prefix
+#' and another for their values
+#' @export
+#'
+#' @examples
 tidy_df <- function(data, column_prefix = "var"){
   data %>%
     gather(starts_with(column_prefix), key = "variable", value = "value") %>% 
