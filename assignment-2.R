@@ -98,9 +98,44 @@ austenWords <- extract_possible_names(austen_text1, "text", "id")
 
 # Question 3 ------------------------------------------------------------------------------------------------------
 austen_word_freqs <- readRDS("austen_word_freqs.Rds")
+
 # filter_names
+#' Title
+#'
+#' @param data: the data u have from the previous part
+#' @param dataBase: the data in which the frequency of words is given and has two columns: word, count
+#' @param name: the column name in data in which the words are 
+#' Since in the data the capitalized word are given, and in the data base
+#' the words are in lowercase, this function first create a column to change the words into lowercase ones
+#' The number of times where the words are capitalized is then calculated (captilizedTimes)
+#' The percentage is calculated based on the count value in data base and the captilizedTimes
+#' and then this value is attached to the initial data
+#'
+#' @return: the initial data with 2 more columns: word (the names in lowercase), percentage
+#' @export
+#'
+#' @examples
+filter_names <- function(data, dataBase, name) {
+  data$lowerCaseName <- tolower(data[[name]])
+  summarizedData <- data %>% 
+    group_by(lowerCaseName) %>% 
+    summarise(captilizedTimes = n()) %>% 
+    rename(word = lowerCaseName) %>% 
+    inner_join(dataBase, by = "word")
+  
+  summarizedData <- summarizedData %>% 
+    mutate(percentage = round(captilizedTimes/count, digits = 2)*100) %>% 
+    select(-captilizedTimes, -count)
+                            
+  data <- data %>% 
+    rename(word = lowerCaseName) %>% 
+    inner_join(summarizedData, by = "word") %>% 
+    filter(percentage >= 75)
+  
+}
 
-
+# To check the function:
+austenWords <- filter_names(austenWords, austen_word_freqs, "name")
 
 # Question 4 ------------------------------------------------------------------------------------------------------
 
