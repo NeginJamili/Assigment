@@ -85,9 +85,8 @@ Austen_Sep <- mutate(Austen_Sep, id = rownames(Austen_Sep))
 
 Austen_Sep <- select(Austen_Sep, id, text_id, name)
 
-
 # Question 3 ------------------------------------------------------------------------------------------------------
-
+austen_word_freqs <- readRDS("austen_word_freqs.Rds")
 # filter_names
 
 
