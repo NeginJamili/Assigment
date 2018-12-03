@@ -53,8 +53,7 @@ get_jane_austen_data <- function(){
 
 get_jane_austen_data ()
 
-# extract_possible_names 
-#' Title
+#' extract_possible_names
 #'
 #' @param data 
 #' @param nameCol: is the column in which the text is given
@@ -95,12 +94,12 @@ extract_possible_names <- function(data, nameCol, idCol) {
 # To check the function:
 austen_text1 <- austen_text
 austenWords <- extract_possible_names(austen_text1, "text", "id")
+View(austenWords)
 
 # Question 3 ------------------------------------------------------------------------------------------------------
 austen_word_freqs <- readRDS("austen_word_freqs.Rds")
 
-# filter_names
-#' Title
+#' filter_names
 #'
 #' @param data: the data u have from the previous part
 #' @param dataBase: the data in which the frequency of words is given and has two columns: word, count
@@ -130,13 +129,35 @@ filter_names <- function(data, dataBase, name) {
   data <- data %>% 
     rename(word = lowerCaseName) %>% 
     inner_join(summarizedData, by = "word") %>% 
-    filter(percentage >= 75)
-  
+    filter(percentage >= 75) %>% 
+    select(-word)
 }
 
 # To check the function:
 austenWords <- filter_names(austenWords, austen_word_freqs, "name")
+View(austenWords)
 
 # Question 4 ------------------------------------------------------------------------------------------------------
 
 # count_names_per_book
+
+# database is the original data containing title of books in column "title" and text_id in "id"
+# data is a table with id, text_id, name 
+count_names_per_book <- function(database, data) {
+  database <- database %>% 
+    select(id, title) %>% 
+    rename(text_id = id) 
+  
+  data <- inner_join(data, database, by = "text_id")
+  
+  WordsPerBook <- data %>% 
+    group_by(title) %>% 
+    summarise(unique_names = length(unique(name)), name_occurrences = n())
+}
+
+# To check the function:
+austen_text2 <- austen_text
+WordsPerBook <- count_names_per_book (austen_text2, austenWords)
+View(WordsPerBook)
+
+
