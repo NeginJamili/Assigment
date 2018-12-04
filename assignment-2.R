@@ -80,13 +80,13 @@ extract_possible_names <- function(data, text_column, id_column) {
   
   new_names = c(paste("word",1:max_words,sep=""))
   data <- data %>%
-    separate(text, into = new_names, remove = TRUE)
+    separate(text_column, into = new_names, remove = TRUE)
   data <- tidy_df(data, "word")
   data <- data %>% 
     filter(value > 0 & str_detect(value,"^[A-Z]."))
   #  . is added to remove one-letter words such as "A" or "I" from the list
   data <- data %>% 
-    rename(text_id = id, name = value) %>% 
+    rename(text_id = id_column, name = value) %>% 
     mutate(id = rownames(data)) %>% 
     select(id, text_id, name)
 }
