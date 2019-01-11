@@ -1,4 +1,3 @@
-#hello
 library(tidyverse)
 library(xml2)
 library(RCurl)
@@ -7,7 +6,7 @@ base_url <- "https://www.cia.gov/library/publications/the-world-factbook/"
 
 #' Question 1: Get Population Ranking
 #'
-#' @return
+#' @return all_data: A dataframe including country, country link, their population and ranking
 #' @export
 #'
 #' @examples
@@ -17,10 +16,23 @@ get_population_ranking <- function(){
                          "value" = "//tr/td[3]",
                          "rank" = "//tr/td[1]")
   url = str_c(base_url, "fields/335rank.html")
+  
   #download url and execute all XPath queries which will each return a column for a data_frame
+  url_data <- read_html(download_html(url))
+  all_countries <- xml_find_all(url_data, xpath_expressions['country'])
+  country_links <- xml_find_all(url_data, xpath_expressions['country_link'])
+  value <- xml_find_all(url_data, xpath_expressions['value'])
+  rank <- xml_find_all(url_data, xpath_expressions['rank'])
   
   #make the necessary adjustments to the data frame as given by the assignment
+  all_data <- data.frame(country = c(sapply(all_countries,xml_text)), 
+                         country_link = c(gsub("../","", lapply(country_links, xml_text))),
+                         population=c(sapply(value,xml_text)),
+                         rank.population=c(sapply(rank,xml_text)))
+  return(all_data)
 }
+
+get_population_ranking ()
 
 
 #' Question 2: Retrieve Land Area
