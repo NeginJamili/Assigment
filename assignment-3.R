@@ -25,14 +25,14 @@ get_population_ranking <- function(){
   rank <- xml_find_all(url_data, xpath_expressions['rank'])
   
   #make the necessary adjustments to the data frame as given by the assignment
-  all_data <- data.frame(country = c(sapply(all_countries,xml_text)), 
-                         country_link = c(gsub("\\../","", sapply(country_links, xml_text))),
+  all_data <- data.frame(country_link = c(sapply(country_links,xml_text)), 
+                         country = c(gsub("\\../","", sapply(all_countries, xml_text))),
                          population=c(sapply(value,xml_text)),
                          rank.population=c(sapply(rank,xml_text)))
   return(all_data)
 }
 
-get_population_ranking ()
+get_population_ranking()
 
 #' Question 2: Retrieve Land Area
 #'
@@ -59,7 +59,7 @@ get_land_area <- function(country_link){
 
 # Testing the funtion:
 country_link <- all_data$country_link
-get_land_area(country_link)
+Out <- get_land_area(country_link)
 
 
 #' Question 3: Get Population Density
@@ -70,9 +70,18 @@ get_land_area(country_link)
 #' @examples
 get_population_density <- function(){
   
+  
+  
 }
 
+compeleted_data <- cbind(all_data,area_data)
+compeleted_data$area_data <- parse_number(compeleted_data$area_data)
+compeleted_data$population <- parse_number(compeleted_data$population)
+compeleted_data[12, "area_data"] <- 1000000
+compeleted_data <- mutate(compeleted_data, population_density = population/area_data) 
 
+  
+}
 #' Question 4: Get All Provided Rankings
 #'
 #' @return
