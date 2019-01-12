@@ -27,15 +27,15 @@ get_population_ranking <- function(){
   rank <- xml_find_all(url_data, xpath_expressions['rank'])
   
   #make the necessary adjustments to the data frame as given by the assignment
-  all_data <- data.frame(country_link = c(sapply(country_links,xml_text)), 
-                         country = c(gsub("\\../","", sapply(all_countries, xml_text))),
+  all_data <- data.frame(country_link = c(gsub("\\../","", sapply(country_links, xml_text))),
+                         country = c(sapply(all_countries,xml_text)),
                          population = c(sapply(value,xml_text)),
                          rank.population = c(sapply(rank,xml_text)))
   return(all_data)
 }
 
 # Testing the funtion:
-get_population_ranking()
+all_data <- get_population_ranking()
 
 # Q2 ----------------------------------------------------------------------
 
@@ -53,6 +53,7 @@ get_land_area <- function(country_link){
   area_url = str_c(base_url, country_link)
   area_data <- vector(length = length(country_link))
   
+  #for (i in 1:5) {
   for (i in 1:length(country_link)) {
     Temp1 <- read_html(download_html(area_url[i]))
     Temp2 <- xml_find_all(Temp1, xpath)
@@ -65,7 +66,7 @@ get_land_area <- function(country_link){
 # Testing the funtion:
 country_link <- all_data$country_link
 Out <- get_land_area(country_link)
-
+View(Out)
 
 # Q3 ----------------------------------------------------------------------
 
@@ -132,8 +133,26 @@ get_ranking <- function(url = "fields/335rank.html", characteristic = "populatio
                          "country" = "//td[@class='region']/a",
                          "value" = "//tr/td[3]",
                          "rank" = "//tr/td[1]")
-  #...
+  finalURL = str_c(base_url, url)
+  url_data <- read_html(download_html(finalURL))
+  
+  all_countries <- xml_find_all(url_data, xpath_expressions['country'])
+  country_links <- xml_find_all(url_data, xpath_expressions['country_link'])
+  value <- xml_find_all(url_data, xpath_expressions['value'])
+  rank <- xml_find_all(url_data, xpath_expressions['rank'])
+  
+  all_data <- data.frame(country_link = c(gsub("\\../","", sapply(country_links, xml_text))),
+                         country = c(sapply(all_countries,xml_text)),
+                         var = c(sapply(value,xml_text)),
+                         rank = c(sapply(rank,xml_text)))
+  all_data <- all_data %>% rename(!!characteristic := var) 
+                          
+  return(all_data)
 }
+
+# Testing the funtion:
+get_ranking("fields/355rank.html", "life expectancy at birth")
+get_ranking()
 
 #' Question 5 - Part 2: Get Country Characteristic
 #'
@@ -147,8 +166,25 @@ get_ranking <- function(url = "fields/335rank.html", characteristic = "populatio
 #' @examples
 get_country_characteristic <- function(country_link, xpath_field_id = "field-area", item = 2){
   #update the xpath and use similar code other than that
+  xpath <- str_c("//div[@id='",xpath_field_id,"']/div[",item,"]/span[2]")
+  characteristic_url = str_c(base_url, country_link)
+  characteristic_data <- vector(length = length(country_link))
+  
+  #for (i in 1:5) {
+  for (i in 1:length(country_link)) {
+    Temp1 <- read_html(download_html(characteristic_url[i]))
+    Temp2 <- xml_find_all(Temp1, xpath)
+    characteristic_data[i] <- xml_text(Temp2)
+  }
+  
+  return(characteristic_data)
+  
 }
 
+# Testing the funtion:
+country_link <- all_data$country_link
+Output <- get_country_characteristic(country_link, "field-land-use", 1)
+View(Output)
 
 #' Question 6: Combine Rankings
 #'
