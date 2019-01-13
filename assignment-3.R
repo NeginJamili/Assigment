@@ -36,6 +36,7 @@ get_population_ranking <- function(){
 
 # Testing the funtion:
 all_data <- get_population_ranking()
+View(all_data)
 
 # Q2 ----------------------------------------------------------------------
 
@@ -52,8 +53,9 @@ get_land_area <- function(country_link){
   #download the file from country_link and execute the xpath query
   area_url = str_c(base_url, country_link)
   area_data <- vector(length = length(country_link))
+  #area_data <- c()
   
-  #for (i in 1:5) {
+  #for (i in 1:10) {
   for (i in 1:length(country_link)) {
     Temp1 <- read_html(download_html(area_url[i]))
     Temp2 <- xml_find_all(Temp1, xpath)
@@ -65,8 +67,8 @@ get_land_area <- function(country_link){
 
 # Testing the funtion:
 country_link <- all_data$country_link
-Out <- get_land_area(country_link)
-View(Out)
+area_data <- get_land_area(country_link)
+View(area_data)
 
 # Q3 ----------------------------------------------------------------------
 
@@ -82,12 +84,16 @@ get_population_density <- function(){
   compeleted_data$population <- parse_number(compeleted_data$population)
   compeleted_data[12, "area_data"] <- 1000000
   compeleted_data <- mutate(compeleted_data, population_density = population/area_data) 
+  # In order to have the dataset in a more proper order, I've changed the order of columns
+  compeleted_data <- subset(compeleted_data, select=c(country_link, country, rank.population,
+                                                      population, area_data, population_density))
   
   return(compeleted_data)
 }
 
 # Testing the funtion:
-get_population_density()
+compeleted_data <- get_population_density()
+View(compeleted_data)
 
 # Q4 ----------------------------------------------------------------------
 
@@ -116,6 +122,7 @@ get_rankings <- function(){
 
 # Testing the funtion:
 rankings <- get_rankings()
+View(rankings)
 
 # Q5 ----------------------------------------------------------------------
 
@@ -205,8 +212,8 @@ combine_rankings <- function(rankings){
                               as.character(rankings[1, "characteristic"]))
   
   # Starting from the second data...
-  for (i in 2:10){
-  #for (i in 2:nrow(rankings)){
+  #for (i in 2:10){
+  for (i in 2:nrow(rankings)){
     url_var <- as.character(rankings[i, "characteristic_link"])
     characteristic_var <- as.character(rankings[i, "characteristic"])
     current_rankings <- get_ranking(url_var, characteristic_var)
