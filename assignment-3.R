@@ -107,15 +107,15 @@ get_rankings <- function(){
   characteristic_data <- xml_find_all(url_data2, xpath['characteristic'])
   links_data <- xml_find_all(url_data2, xpath['characteristic_link'])
   
-  final_data <- data.frame(characteristic = c(tolower(gsub(".$","", sapply(characteristic_data, xml_text)))),
+  rankings <- data.frame(characteristic = c(tolower(gsub(".$","", sapply(characteristic_data, xml_text)))),
                            characteristic_link = c(gsub("\\../","", sapply(links_data, xml_text))))
   
-  return(final_data)
+  return(rankings)
   
 }
 
 # Testing the funtion:
-get_rankings()
+rankings <- get_rankings()
 
 # Q5 ----------------------------------------------------------------------
 
@@ -144,7 +144,7 @@ get_ranking <- function(url = "fields/335rank.html", characteristic = "populatio
   all_data <- data.frame(country_link = c(gsub("\\../","", sapply(country_links, xml_text))),
                          country = c(sapply(all_countries,xml_text)),
                          var = c(sapply(value,xml_text)),
-                         rank = c(sapply(rank,xml_text)))
+                         rank = c(sapply(rank,xml_text)), stringsAsFactors=FALSE)
   all_data <- all_data %>% rename(!!characteristic := var) 
                           
   return(all_data)
@@ -195,8 +195,30 @@ View(Output)
 #'
 #' @examples
 combine_rankings <- function(rankings){
+  current_rankings <- c()
+  # Considering data of the first characteristic as the default data 
+  # in order to join the others with this one
+  all_rankings <- get_ranking(as.character(rankings[1, "characteristic_link"]),
+                              as.character(rankings[1, "characteristic"]))
   
+  # Starting from the second data...
+  for (i in 2:4){
+  #for (i in 2:nrow(rankings)){
+    url_var <- as.character(rankings[i, "characteristic_link"])
+    characteristic_var <- as.character(rankings[i, "characteristic"])
+    current_rankings <- get_ranking(url_var, characteristic_var)
+    # Removing the link column in order to have it only once in the final dataset
+    current_rankings <- current_rankings[,-(1)] 
+    all_rankings <- full_join(all_rankings, current_rankings, by="country")
+  }
+  
+  # Replacing the NA error
+  all_rankings <- replace(all_rankings, is.na(all_rankings), "No Data")
+  
+  return(all_rankings)
 }
 
-
+# Testing the function
+all_rankings <- combine_rankings(rankings)
+View(all_rankings)
 
