@@ -146,6 +146,7 @@ get_ranking <- function(url = "fields/335rank.html", characteristic = "populatio
                          var = c(sapply(value,xml_text)),
                          rank = c(sapply(rank,xml_text)), stringsAsFactors=FALSE)
   all_data <- all_data %>% rename(!!characteristic := var) 
+  colnames(all_data)[4] <- paste("rank", characteristic, sep = ".")
                           
   return(all_data)
 }
@@ -186,6 +187,8 @@ country_link <- all_data$country_link
 Output <- get_country_characteristic(country_link, "field-land-use", 1)
 View(Output)
 
+# Q6 ----------------------------------------------------------------------
+
 #' Question 6: Combine Rankings
 #'
 #' @param rankings Rankings from get_rankings (or a selection thereof)
@@ -202,7 +205,7 @@ combine_rankings <- function(rankings){
                               as.character(rankings[1, "characteristic"]))
   
   # Starting from the second data...
-  for (i in 2:4){
+  for (i in 2:10){
   #for (i in 2:nrow(rankings)){
     url_var <- as.character(rankings[i, "characteristic_link"])
     characteristic_var <- as.character(rankings[i, "characteristic"])
@@ -221,4 +224,5 @@ combine_rankings <- function(rankings){
 # Testing the function
 all_rankings <- combine_rankings(rankings)
 View(all_rankings)
+
 
