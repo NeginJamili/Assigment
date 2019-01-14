@@ -28,9 +28,9 @@ get_population_ranking <- function(){
   
   #make the necessary adjustments to the data frame as given by the assignment
   all_data <- data.frame(country_link = c(gsub("\\../","", sapply(country_links, xml_text))),
-                         country = c(sapply(all_countries,xml_text)),
-                         population = c(sapply(value,xml_text)),
-                         rank.population = c(sapply(rank,xml_text)))
+                         country = c(sapply(all_countries, xml_text)),
+                         population = c(sapply(value, xml_text)),
+                         rank.population = c(sapply(rank, xml_text)))
   return(all_data)
 }
 
@@ -65,10 +65,48 @@ get_land_area <- function(country_link){
   return(area_data)
 }
 
-# Testing the funtion:
+# Testing the funtion (one URL and a vecotr of URLs):
+country_link <- "geos/us.html"
+area_data <- get_land_area(country_link)
+View(area_data)
+
 country_link <- all_data$country_link
 area_data <- get_land_area(country_link)
 View(area_data)
+
+# In order to have the output in a better structure, I've written the following function,
+# where the output includes the country name and its area as well
+get_land_area2 <- function(country_link){
+  xpath <- str_c("//div[@id='","field-area","']/div[",2,"]/span[2]")
+  #download the file from country_link and execute the xpath query
+  area_url = str_c(base_url, country_link)
+  area_data2 <- vector(length = length(country_link))
+  country_name <- vector(length = length(country_link))
+  
+  #for (i in 1:10) {
+  for (i in 1:length(country_link)) {
+    
+    Temp1 <- read_html(download_html(area_url[i]))
+    Temp2 <- xml_find_all(Temp1, xpath)
+    area_data2[i] <- xml_text(Temp2)
+    name <- country_link[i]
+    country_name[i] <- as.character(unique(all_data$country[all_data$country_link == name])) 
+  }
+  area_data2 <- cbind(area_data2, country_name)
+  colnames(area_data2)[1] <- "area"
+  colnames(area_data2)[2] <- "country"
+  
+  return(area_data2)
+}
+
+# Testing the funtion (one URL and a vecotr of URLs):
+country_link <- "geos/us.html"
+area_data2 <- get_land_area2(country_link)
+View(area_data2)
+
+country_link <- all_data$country_link
+area_data2 <- get_land_area2(country_link)
+View(area_data2)
 
 # Q3 ----------------------------------------------------------------------
 
@@ -84,6 +122,10 @@ get_population_density <- function(){
   compeleted_data$population <- parse_number(compeleted_data$population)
   compeleted_data[12, "area_data"] <- 1000000
   compeleted_data <- mutate(compeleted_data, population_density = population/area_data) 
+  
+  # Replacing the NA error
+  compeleted_data <- replace(compeleted_data, is.na(compeleted_data), "No Data")
+  
   # In order to have the dataset in a more proper order, I've changed the order of columns
   compeleted_data <- subset(compeleted_data, select=c(country_link, country, rank.population,
                                                       population, area_data, population_density))
@@ -159,8 +201,11 @@ get_ranking <- function(url = "fields/335rank.html", characteristic = "populatio
 }
 
 # Testing the funtion:
-get_ranking("fields/355rank.html", "life expectancy at birth")
-get_ranking()
+example1 <- get_ranking("fields/355rank.html", "life expectancy at birth")
+View(example1)
+
+example2 <- get_ranking()
+View(example2)
 
 #' Question 5 - Part 2: Get Country Characteristic
 #'
@@ -191,8 +236,11 @@ get_country_characteristic <- function(country_link, xpath_field_id = "field-are
 
 # Testing the funtion:
 country_link <- all_data$country_link
-Output <- get_country_characteristic(country_link, "field-land-use", 1)
-View(Output)
+Output1 <- get_country_characteristic(country_link, "field-area", 3)
+View(Output1)
+
+Output2 <- get_country_characteristic(country_link)
+View(Output2)
 
 # Q6 ----------------------------------------------------------------------
 
