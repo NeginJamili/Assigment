@@ -52,8 +52,8 @@ get_land_area <- function(country_link){
   xpath <- str_c("//div[@id='","field-area","']/div[",2,"]/span[2]")
   #download the file from country_link and execute the xpath query
   area_url = str_c(base_url, country_link)
+  # Initialization
   area_data <- vector(length = length(country_link))
-  #area_data <- c()
   
   #for (i in 1:10) {
   for (i in 1:length(country_link)) {
@@ -120,6 +120,7 @@ get_population_density <- function(){
   compeleted_data <- cbind(all_data,area_data)
   compeleted_data$area_data <- parse_number(compeleted_data$area_data)
   compeleted_data$population <- parse_number(compeleted_data$population)
+  # Changing the area of Ethiopia
   compeleted_data[12, "area_data"] <- 1000000
   compeleted_data <- mutate(compeleted_data, population_density = population/area_data) 
   
@@ -195,6 +196,7 @@ get_ranking <- function(url = "fields/335rank.html", characteristic = "populatio
                          var = c(sapply(value,xml_text)),
                          rank = c(sapply(rank,xml_text)), stringsAsFactors=FALSE)
   all_data <- all_data %>% rename(!!characteristic := var) 
+  # Definig the name of rank column based on the characteristic variable
   colnames(all_data)[4] <- paste("rank", characteristic, sep = ".")
                           
   return(all_data)
